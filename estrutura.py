@@ -1,5 +1,4 @@
 
-
 from cv2 import sqrt
 
 
@@ -25,3 +24,26 @@ def distanciaEuclidiana(v: vertice, u: vertice) -> int:
     x = (v.x - u.x)**2
     y = (v.y-u.y)**2
     return sqrt(x+y)
+
+
+def constroiGrafo() -> grafo:
+    g = grafo()
+
+    for vertice in vertices.values():
+        g.setVertice(vertice[0], vertice[1])
+
+    return g
+
+
+def construtivoVizinhoMaisProximo():
+    g = constroiGrafo()
+
+    # fazer algoritmo aqui
+
+    return g
+
+
+def lerVertices():
+    # ler até encontra NODE_COORD_SECTION
+
+    ## linha = lerProximaLinha()
