@@ -2,6 +2,7 @@
 from typing import List
 from estrutura import *
 import sys
+import random
 
 
 def getVertices(caminho):
@@ -21,11 +22,40 @@ def getDistancias(g: grafo) -> List[List[int]]:
     EDs = []
     for i in range(len(g.vertices)):
         ED = []
-        for j in range(i+1, len(g.vertices)):
+        for j in range(len(g.vertices)):
             dist = distanciaEuclidiana(g.vertices[i], g.vertices[j])
+            if dist == 0:
+                dist = math.inf
             ED.append(dist)
         EDs.append(ED)
     return EDs
+
+
+def isInseridos(inseridos):
+    for i in inseridos:
+        if not i:
+            return False
+    return True
+
+
+def vizinhoMaisProximo(g: grafo, Eds):
+    inseridos = [False]*len(g.vertices)
+    caminho = []
+    roteiro = [random.randint(0, len(g.vertices)-1)]
+    while not isInseridos(inseridos):
+        insereMaisProximo(roteiro, Eds, caminho, inseridos)
+    return caminho
+
+
+def insereMaisProximo(roteiro, Eds, caminho, inseridos):
+    ultimoInserido = roteiro[len(roteiro)-1]
+    maisProximo = Eds[ultimoInserido].index(min(Eds[ultimoInserido]))
+    if not inseridos[maisProximo]:
+        roteiro.append(maisProximo)
+        caminho.append(Eds[ultimoInserido][maisProximo])
+        inseridos[maisProximo] = True
+    Eds[ultimoInserido][maisProximo] = math.inf
+    Eds[maisProximo][ultimoInserido] = math.inf
 
 
 def main():
@@ -34,7 +64,13 @@ def main():
     construtor = getVertices(caminho)
     g = constroiGrafo(construtor)
     EDs = getDistancias(g)
-    print(EDs)
+    caminho = vizinhoMaisProximo(g, EDs)
+    soma = 0
+    for peso in caminho:
+        soma = soma+peso
+    print(soma)
+
+    print("ola")
 
 
 main()
