@@ -1,16 +1,18 @@
 
+from copy import deepcopy
 from typing import List
 from estrutura import *
 import sys
 import random
 
 
-def getVertices(caminho):
-    arq = open(caminho)
+def getVertices():
     descricao = []
+    imput = ''
     vertices = []
-    for line in arq:
-        descricao.append(line.strip('\n'))
+    while imput != 'EOF':
+        imput = input()
+        descricao.append(imput.strip("\r"))
     index = descricao.index('NODE_COORD_SECTION')
     construtor = descricao[index + 1: len(descricao)-1]
     for i in range(len(construtor)):
@@ -38,9 +40,10 @@ def isInseridos(inseridos):
     return True
 
 
-def vizinhoMaisProximo(g: grafo, Eds):
+def vizinhoMaisProximo(g: grafo, EDs):
     inseridos = [False]*len(g.vertices)
     caminho = []
+    Eds = deepcopy(EDs)
     roteiro = [random.randint(0, len(g.vertices)-1)]
     while not isInseridos(inseridos):
         insereMaisProximo(roteiro, Eds, caminho, inseridos)
@@ -60,8 +63,7 @@ def insereMaisProximo(roteiro, Eds, caminho, inseridos):
 
 def main():
     x = 33522
-    caminho = sys.argv[1]
-    construtor = getVertices(caminho)
+    construtor = getVertices()
     g = constroiGrafo(construtor)
     EDs = getDistancias(g)
     caminho = vizinhoMaisProximo(g, EDs)
@@ -69,8 +71,6 @@ def main():
     for peso in caminho:
         soma = soma+peso
     print(soma)
-
-    print("ola")
 
 
 main()
