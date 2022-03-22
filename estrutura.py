@@ -1,5 +1,5 @@
 
-from cv2 import sqrt
+import math
 
 
 class grafo:
@@ -23,14 +23,14 @@ class vertice:
 def distanciaEuclidiana(v: vertice, u: vertice) -> int:
     x = (v.x - u.x)**2
     y = (v.y-u.y)**2
-    return sqrt(x+y)
+    return math.sqrt(x+y)
 
 
-def constroiGrafo() -> grafo:
+def constroiGrafo(descricao) -> grafo:
     g = grafo()
 
-    for vertice in vertices.values():
-        g.setVertice(vertice[0], vertice[1])
+    for vertice in descricao:
+        g.setVertice(int(vertice[1]), int(vertice[2]))
 
     return g
 
@@ -47,3 +47,4 @@ def lerVertices():
     # ler até encontra NODE_COORD_SECTION
 
     ## linha = lerProximaLinha()
+    return
