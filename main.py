@@ -19,7 +19,6 @@ def getVertices():
         vertices.append(construtor[i].split(' ', 3))
     return vertices
 
-
 def getDistancias(g: grafo) -> List[List[int]]:
     EDs = []
     for i in range(len(g.vertices)):
@@ -27,7 +26,7 @@ def getDistancias(g: grafo) -> List[List[int]]:
         for j in range(len(g.vertices)):
             dist = distanciaEuclidiana(g.vertices[i], g.vertices[j])
             if dist == 0:
-                dist = math.inf
+                dist = None
             ED.append(dist)
         EDs.append(ED)
     return EDs
@@ -59,6 +58,17 @@ def insereMaisProximo(roteiro, Eds, caminho, inseridos):
         inseridos[maisProximo] = True
     Eds[ultimoInserido][maisProximo] = math.inf
     Eds[maisProximo][ultimoInserido] = math.inf
+
+
+def insereMaisLonge(roteiro, Eds, caminho, inseridos):
+    ultimoInserido = roteiro[len(roteiro)-1]
+    maisLonge = Eds[ultimoInserido].index(max(Eds[ultimoInserido]))
+    if not inseridos[maisLonge]:
+        roteiro.append(maisLonge)
+        caminho.append(Eds[ultimoInserido][maisLonge])
+        inseridos[maisLonge] = True
+    Eds[ultimoInserido][maisLonge] = math.inf
+    Eds[maisLonge][ultimoInserido] = math.inf
 
 
 def main():
