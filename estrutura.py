@@ -1,5 +1,6 @@
 
 import math
+from shutil import ExecError
 
 
 class grafo:
@@ -28,9 +29,14 @@ def distanciaEuclidiana(v: vertice, u: vertice) -> int:
 
 def constroiGrafo(descricao) -> grafo:
     g = grafo()
-
+    track=[]
     for vertice in descricao:
-        g.setVertice(int(vertice[1]), int(vertice[2]))
+        
+        result = list(filter(lambda val: val !=  '', vertice)) 
+        try:
+            g.setVertice(int(result[1]), int(result[2]))
+        except IndexError:
+            raise Exception(result)
 
     return g
 

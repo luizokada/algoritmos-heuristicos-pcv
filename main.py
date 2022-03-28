@@ -10,13 +10,15 @@ def getVertices():
     descricao = []
     imput = ''
     vertices = []
-    while imput != 'EOF':
+    while imput.find('EOF')==-1:
         imput = input()
         descricao.append(imput.strip("\r"))
+        
     index = descricao.index('NODE_COORD_SECTION')
     construtor = descricao[index + 1: len(descricao)-1]
     for i in range(len(construtor)):
-        vertices.append(construtor[i].split(' ', 3))
+       
+        vertices.append(construtor[i].split(' '))
     return vertices
 
 def getDistancias(g: grafo) -> List[List[int]]:
@@ -26,7 +28,7 @@ def getDistancias(g: grafo) -> List[List[int]]:
         for j in range(len(g.vertices)):
             dist = distanciaEuclidiana(g.vertices[i], g.vertices[j])
             if dist == 0:
-                dist = None
+                dist = math.inf
             ED.append(dist)
         EDs.append(ED)
     return EDs
@@ -76,11 +78,21 @@ def main():
     construtor = getVertices()
     g = constroiGrafo(construtor)
     EDs = getDistancias(g)
-    caminho = vizinhoMaisProximo(g, EDs)
-    soma = 0
-    for peso in caminho:
-        soma = soma+peso
-    print(soma)
+    menor=math.inf
+    if len(g.vertices)>100:
+        num_exec=2
+    else:
+        num_exec=100
+        
+    for i in range(num_exec): 
+        caminho = vizinhoMaisProximo(g, EDs)
+        soma = 0
+        for peso in caminho:
+            soma = soma+peso
+        if soma<menor:
+            menor = soma
+            
+    print(menor)
 
 
 main()
