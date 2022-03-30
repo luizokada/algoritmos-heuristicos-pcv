@@ -17,7 +17,12 @@ def getMaisPoximo(g, vertice,inseridos):
     return menor,maisProximo
             
 
-    
+def getDistancia(g,vertices):
+    pesoTotal=0
+    for i in range(len(vertices)-1):
+        pesoTotal=pesoTotal+distanciaEuclidiana(g.vertices[vertices[i]],g.vertices[vertices[i+1]])
+    return pesoTotal
+        
 def getVertices():
     descricao = []
     imput = ''
@@ -55,10 +60,13 @@ def isInseridos(inseridos):
 
 def vizinhoMaisProximo(g: grafo):
     inseridos = [False]*len(g.vertices)
-    caminho = []
+    caminho = 0
     roteiro = [random.randint(0, len(g.vertices)-1)]
+    inseridos[inseridos[0]]=True
     while not isInseridos(inseridos):
-        insereMaisProximo(roteiro, g, caminho, inseridos)
+        caminho = insereMaisProximo(roteiro, g, caminho, inseridos)
+    roteiro.append(roteiro[0])
+    caminho=caminho+distanciaEuclidiana(g.vertices[roteiro[0]],g.vertices[roteiro[len(roteiro)-2]])
     return caminho,roteiro
 
 
@@ -67,8 +75,9 @@ def insereMaisProximo(roteiro, g, caminho, inseridos):
     peso,maisProximo = getMaisPoximo(g,ultimoInserido,inseridos)
     if not inseridos[maisProximo]:
         roteiro.append(maisProximo)
-        caminho.append(peso)
+        caminho = caminho + peso
         inseridos[maisProximo] = True
+    return caminho
 
 
 def insereMaisLonge(roteiro, Eds, caminho, inseridos):
@@ -83,9 +92,23 @@ def insereMaisLonge(roteiro, Eds, caminho, inseridos):
 
 
 
-def opt_2(vertices,Eds):
-    
-    return 0
+def opt_2(g,vertices,caminho):
+    melhorCaminho = vertices
+    melhor=caminho
+    for i in range(1,len(vertices)-3):
+        aux=vertices[i]
+        for j in range(i+1,len(vertices)-1):
+            vertices[i]=vertices[j]
+            vertices[j]=aux
+            novoCaminho=getDistancia(g,vertices)
+            if novoCaminho<melhor:
+                melhor=novoCaminho
+                melhorCaminho=deepcopy(vertices)
+            vertices[j]=vertices[i]
+            vertices[i]=aux
+    if melhor<caminho:
+        melhor= opt_2(g,melhorCaminho,melhor)
+    return melhor
     
 
 
@@ -94,19 +117,16 @@ def main():
     construtor = getVertices()
     g = constroiGrafo(construtor)
     menor=math.inf
-    if len(g.vertices)>100:
-        num_exec=2
+    if len(g.vertices)>60:
+        exc=3
     else:
-        num_exec=100
-        
-    for i in range(num_exec): 
-        caminho,roteiro = vizinhoMaisProximo(g)
-        soma = 0
-        for peso in caminho:
-            soma = soma+peso
-        if soma<menor:
-            menor = soma
-            
+        exc=10
+    for i in range(exc):
+        _,vertices = vizinhoMaisProximo(g)
+        caminho=getDistancia(g,vertices)
+        best=opt_2(g,vertices,caminho)    
+        if best<menor:
+            menor=best  
     print(menor)
 
 
