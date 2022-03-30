@@ -5,7 +5,19 @@ from estrutura import *
 import sys
 import random
 
+def getMaisPoximo(g, vertice,inseridos):
+    menor = math.inf
+    maisProximo = math.inf
+    for i in range(len(g.vertices)):
+        if i !=vertice:
+            dist = distanciaEuclidiana(g.vertices[vertice], g.vertices[i])
+            if (dist <menor and not inseridos[i]):
+                menor = dist
+                maisProximo=i
+    return menor,maisProximo
+            
 
+    
 def getVertices():
     descricao = []
     imput = ''
@@ -41,25 +53,22 @@ def isInseridos(inseridos):
     return True
 
 
-def vizinhoMaisProximo(g: grafo, EDs):
+def vizinhoMaisProximo(g: grafo):
     inseridos = [False]*len(g.vertices)
     caminho = []
-    Eds = deepcopy(EDs)
     roteiro = [random.randint(0, len(g.vertices)-1)]
     while not isInseridos(inseridos):
-        insereMaisProximo(roteiro, Eds, caminho, inseridos)
-    return caminho
+        insereMaisProximo(roteiro, g, caminho, inseridos)
+    return caminho,roteiro
 
 
-def insereMaisProximo(roteiro, Eds, caminho, inseridos):
+def insereMaisProximo(roteiro, g, caminho, inseridos):
     ultimoInserido = roteiro[len(roteiro)-1]
-    maisProximo = Eds[ultimoInserido].index(min(Eds[ultimoInserido]))
+    peso,maisProximo = getMaisPoximo(g,ultimoInserido,inseridos)
     if not inseridos[maisProximo]:
         roteiro.append(maisProximo)
-        caminho.append(Eds[ultimoInserido][maisProximo])
+        caminho.append(peso)
         inseridos[maisProximo] = True
-    Eds[ultimoInserido][maisProximo] = math.inf
-    Eds[maisProximo][ultimoInserido] = math.inf
 
 
 def insereMaisLonge(roteiro, Eds, caminho, inseridos):
@@ -73,11 +82,17 @@ def insereMaisLonge(roteiro, Eds, caminho, inseridos):
     Eds[maisLonge][ultimoInserido] = math.inf
 
 
+
+def opt_2(vertices,Eds):
+    
+    return 0
+    
+
+
 def main():
     x = 33522
     construtor = getVertices()
     g = constroiGrafo(construtor)
-    EDs = getDistancias(g)
     menor=math.inf
     if len(g.vertices)>100:
         num_exec=2
@@ -85,7 +100,7 @@ def main():
         num_exec=100
         
     for i in range(num_exec): 
-        caminho = vizinhoMaisProximo(g, EDs)
+        caminho,roteiro = vizinhoMaisProximo(g)
         soma = 0
         for peso in caminho:
             soma = soma+peso
