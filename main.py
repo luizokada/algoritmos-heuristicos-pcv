@@ -62,7 +62,7 @@ def vizinhoMaisProximo(g: grafo):
     inseridos = [False]*len(g.vertices)
     caminho = 0
     roteiro = [random.randint(0, len(g.vertices)-1)]
-    inseridos[inseridos[0]]=True
+    inseridos[roteiro[0]]=True
     while not isInseridos(inseridos):
         caminho = insereMaisProximo(roteiro, g, caminho, inseridos)
     roteiro.append(roteiro[0])
@@ -118,7 +118,7 @@ def main():
     g = constroiGrafo(construtor)
     menor=math.inf
     if len(g.vertices)>60:
-        exc=3
+        exc=2
     else:
         exc=10
     for i in range(exc):
