@@ -1,71 +1,82 @@
 
 from copy import deepcopy
+from tokenize import Double
 from typing import List
+from xmlrpc.client import boolean
 from estrutura import *
 import sys
 import random
 
 
-def getMaisPoximo(g, vertice, inseridos):
-    menor = math.inf
-    maisProximo = math.inf
+def getNearest(g:grafo, node:int, nodesInPath:List[boolean])->int:
+    best = math.inf
+    nearest = math.inf
     for i in range(len(g.vertices)):
-        if i != vertice:
-            dist = distanciaEuclidiana(g.vertices[vertice], g.vertices[i])
-            if (dist < menor and not inseridos[i]):
-                menor = dist
-                maisProximo = i
-    return menor, maisProximo
+        if i != node:
+            dist = distanciaEuclidiana(g.vertices[node], g.vertices[i])
+            if (dist < best and not nodesInPath[i]):
+                best = dist
+                nearest = i
+    return nearest
 
-def insereNoCiclo(g, vertices:List[int], inseridos,vertice):
-    custoDeEntrada=0
-    custoAnterior=0
-    menorCusto=math.inf
-    indiceDeEntrada=math.inf
-    for i in range(len(vertices)):
-        if i !=0 and i!=len(vertices)-1:
-            custoAnterior=distanciaEuclidiana(g.vertices[i],g.vertices[i+1])
-            custoDeEntrada=distanciaEuclidiana(g.vertices[i],g.vertices[vertice])+distanciaEuclidiana(g.vertices[i+1],g.vertices[vertice])
+def insereNoCiclo(g:grafo, path:List[int], nodesInPath:List[boolean],vertice:int)->None:
+    entryCost=0
+    exitCost=0
+    bestCost=math.inf
+    entryIndex=math.inf
+    for i in range(len(path)):
+        if i !=0 and i!=len(path)-1:
+            exitCost=distanciaEuclidiana(g.vertices[path[i]],g.vertices[path[i-1]])
+            entryCost=distanciaEuclidiana(g.vertices[path[i]],g.vertices[vertice])+\
+                            distanciaEuclidiana(g.vertices[path[i-1]],g.vertices[vertice])
+                            
         elif i==0:
-            custoAnterior=distanciaEuclidiana(g.vertices[i],g.vertices[i+1])
-            custoDeEntrada=distanciaEuclidiana(g.vertices[len(vertices)-1],g.vertices[vertice])+distanciaEuclidiana(g.vertices[i+1],g.vertices[vertice])
+            exitCost=distanciaEuclidiana(g.vertices[path[len(path)-1]],g.vertices[path[i]])
+            entryCost=distanciaEuclidiana(g.vertices[path[len(path)-1]],g.vertices[vertice])+\
+                            distanciaEuclidiana(g.vertices[path[i]],g.vertices[vertice])
+                            
         else:
-            custoAnterior=distanciaEuclidiana(g.vertices[i],g.vertices[0])
-            custoDeEntrada=distanciaEuclidiana(g.vertices[i],g.vertices[vertice])+distanciaEuclidiana(g.vertices[0],g.vertices[vertice])
-        custoTotal=custoDeEntrada-custoAnterior
-        if custoTotal<menorCusto:
-            menorCusto=custoTotal
-            indiceDeEntrada=i
-    if indiceDeEntrada< len(vertices)-1:
-        vertices.insert(indiceDeEntrada,vertice)
+            exitCost=distanciaEuclidiana(g.vertices[path[i]],g.vertices[path[i-1]])
+            entryCost=distanciaEuclidiana(g.vertices[path[i]],g.vertices[vertice])+\
+                            distanciaEuclidiana(g.vertices[path[0]],g.vertices[vertice])
+        
+        
+        custoTotal=entryCost-exitCost
+        
+        if custoTotal<bestCost:
+            bestCost=custoTotal
+            entryIndex=i
+            
+    if entryIndex< len(path)-1:
+        path.insert(entryIndex,vertice)
     else:
-        vertices.append(vertice)
-    inseridos[vertice]=True
+        path.append(vertice)
+    nodesInPath[vertice]=True
     return 
 
-def inverteSubLista(vertice,i,j):
-    lista=[]
+def buildNewPath(path:List[int],i:int,j:int)->List[int]:
+    newPath=[]
     for k in range(i):
-        lista.append(vertice[k])
-    indice = j
+        newPath.append(path[k])
+    index = j
     for k in range(i,j+1):
-        lista.append(vertice[indice])
-        indice=indice-1
-    for k in range(j+1,len(vertice)):
-        lista.append(vertice[k])
+        newPath.append(path[index])
+        index=index-1
+    for k in range(j+1,len(path)):
+        newPath.append(path[k])
         
-    return lista
+    return newPath
 
-def getDistancia(g, vertices):
-    pesoTotal = 0
-    for i in range(len(vertices)-1):
-        pesoTotal = pesoTotal + \
+def getDistancia(g:grafo, path:List[int]):
+    weight = 0
+    for i in range(len(path)-1):
+        weight = weight + \
             distanciaEuclidiana(
-                g.vertices[vertices[i]], g.vertices[vertices[i+1]])
-    pesoTotal = pesoTotal + \
+                g.vertices[path[i]], g.vertices[path[i+1]])
+    weight = weight + \
             distanciaEuclidiana(
-                g.vertices[vertices[0]], g.vertices[vertices[len(vertices)-1]])
-    return pesoTotal
+                g.vertices[path[0]], g.vertices[path[len(path)-1]])
+    return weight
 
 
 def getVertices():
@@ -81,70 +92,61 @@ def getVertices():
     return vertices
 
 
-def isInseridos(inseridos):
-    for i in inseridos:
+def isAllInPath(nodesInPath)->boolean:
+    for i in nodesInPath:
         if not i:
             return False
     return True
 
 
-def vizinhoMaisProximo(g: grafo):
-    inseridos = [False]*len(g.vertices)
-    caminho = 0
-    roteiro = [random.randint(0, len(g.vertices)-1)]
-    inseridos[roteiro[0]]=True
-    while not isInseridos(inseridos):
-        caminho = insereMaisProximo(roteiro, g, caminho, inseridos)
-    caminho = caminho + \
-        distanciaEuclidiana(
-            g.vertices[roteiro[0]], g.vertices[roteiro[len(roteiro)-2]])
-    return caminho, roteiro
+def nearestNeighbor(g: grafo)->List[int]:
+    nodesInPath = [False]*len(g.vertices)
+    path = [random.randint(0, len(g.vertices)-1)]
+    nodesInPath[path[0]]=True
+    while not isAllInPath(nodesInPath):
+        putNearestAtPath(path, g, nodesInPath)
+    return path
 
 
-def insereMaisProximo(roteiro, g, caminho, inseridos):
-    ultimoInserido = roteiro[len(roteiro)-1]
-    peso, maisProximo = getMaisPoximo(g, ultimoInserido, inseridos)
-    roteiro.append(maisProximo)
-    caminho = caminho + peso
-    inseridos[maisProximo] = True
-    return caminho
+def putNearestAtPath(path:List[int], g:grafo, nodesInPath:List[boolean]):
+    ultimoInserido = path[len(path)-1]
+    maisProximo = getNearest(g, ultimoInserido, nodesInPath)
+    path.append(maisProximo)
+    nodesInPath[maisProximo] = True
 
-def insercaoMaisProximo(g: grafo):
-    inseridos = [False]*len(g.vertices)
-    caminho = 0
+def beginCicle(g:grafo,nodesInPath:List[boolean])->List[int]:
+    path = []
     v1=random.randint(0, len(g.vertices)-1)
-    v2=random.randint(0, len(g.vertices)-1)
-    while v2==v1:
-        v2=random.randint(0, len(g.vertices)-1)
-    v3=random.randint(0, len(g.vertices)-1)
-    while v3==v1 or v3==v2:
-        v3=random.randint(0, len(g.vertices)-1)
-    roteiro = [v1,v2,v3]
-    inseridos[roteiro[0]]=True
-    inseridos[roteiro[1]]=True
-    inseridos[roteiro[2]]=True
-    while not isInseridos(inseridos):
-        vertice=roteiro[random.randint(0,len(roteiro)-1)]
-        _,maisProximo=getMaisPoximo(g,vertice,inseridos)
-        insereNoCiclo(g,roteiro,inseridos,maisProximo)
-    return roteiro
+    path.append(v1)
+    nodesInPath[path[0]]=True
+    v2=getNearest(g,v1,nodesInPath)
+    path.append(v2)
+    nodesInPath[path[1]]=True
+    return path
+    
+def nearestInsertion(g: grafo)->List[int]:
+    nodesInPath = [False]*len(g.vertices)
+    path = beginCicle(g,nodesInPath)
+    while not isAllInPath(nodesInPath):
+        vertice = path[random.randint(0,len(path)-1)]
+        maisProximo=getNearest(g,vertice,nodesInPath)
+        insereNoCiclo(g,path,nodesInPath,maisProximo)
+    return path
 
 
-
-
-def opt_2(g, vertices, caminho):
-    melhorCaminho=vertices
-    melhor = caminho
-    for i in range(len(vertices)-1):
-        for j in range(i+1, len(vertices)):
-            novoCaminho = inverteSubLista(vertices,i,j)
-            novoPeso=getDistancia(g,novoCaminho)
-            if novoPeso < melhor:
-                melhor = novoPeso
-                melhorCaminho = deepcopy(novoCaminho)        
-    if melhor < caminho:
-        melhor,melhorCaminho = opt_2(g, melhorCaminho, melhor)
-    return melhor,melhorCaminho
+def opt_2(g:grafo, path:List[int], weight):
+    bestPath=path
+    bestWeight = weight
+    for i in range(len(path)-1):
+        for j in range(i+1, len(path)):
+            newPath = buildNewPath(path,i,j)
+            newWeight=getDistancia(g,newPath)
+            if newWeight < bestWeight:
+                bestWeight = newWeight
+                bestPath = deepcopy(newPath)        
+    if bestWeight < weight:
+        bestWeight,bestPath = opt_2(g, bestPath, bestWeight)
+    return bestWeight,bestPath
 
 
 def main():
@@ -159,7 +161,7 @@ def main():
     mediaM=0
     g = constroiGrafo(construtor)
     for _  in range(100):
-        _, vertices = vizinhoMaisProximo(g)
+        vertices =  nearestNeighbor(g)
         caminho = getDistancia(g, vertices)
         if caminho>max:
             max=caminho
@@ -180,9 +182,9 @@ def main():
     print("Media do Melhorativo: "+str(mediaM/100))
     print("Pior do Melhorativo: "+str(maxM))
     print("Melhor do Melhorativo: "+str(minM))
-    """distante=insercaoMaisProximo(g)
+    distante=nearestInsertion(g)
     caminho = getDistancia(g, distante)
     bestd,bestPath1 = opt_2(g, distante, caminho)
-    print(distante)"""
+    print(distante)
 
 main()
