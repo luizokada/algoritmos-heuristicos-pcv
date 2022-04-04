@@ -2,13 +2,12 @@
 from copy import deepcopy
 from tokenize import Double
 from typing import List
-from xmlrpc.client import boolean
 from estrutura import *
 import sys
 import random
 
 
-def getNearest(g:grafo, node:int, nodesInPath:List[boolean])->int:
+def getNearest(g:grafo, node:int, nodesInPath:List[bool])->int:
     best = math.inf
     nearest = math.inf
     for i in range(len(g.vertices)):
@@ -19,7 +18,7 @@ def getNearest(g:grafo, node:int, nodesInPath:List[boolean])->int:
                 nearest = i
     return nearest
 
-def insereNoCiclo(g:grafo, path:List[int], nodesInPath:List[boolean],vertice:int)->None:
+def insereNoCiclo(g:grafo, path:List[int], nodesInPath:List[bool],vertice:int)->None:
     entryCost=0
     exitCost=0
     bestCost=math.inf
@@ -92,7 +91,7 @@ def getVertices():
     return vertices
 
 
-def isAllInPath(nodesInPath)->boolean:
+def isAllInPath(nodesInPath)->bool:
     for i in nodesInPath:
         if not i:
             return False
@@ -108,13 +107,13 @@ def nearestNeighbor(g: grafo)->List[int]:
     return path
 
 
-def putNearestAtPath(path:List[int], g:grafo, nodesInPath:List[boolean]):
+def putNearestAtPath(path:List[int], g:grafo, nodesInPath:List[bool]):
     ultimoInserido = path[len(path)-1]
     maisProximo = getNearest(g, ultimoInserido, nodesInPath)
     path.append(maisProximo)
     nodesInPath[maisProximo] = True
 
-def beginCicle(g:grafo,nodesInPath:List[boolean])->List[int]:
+def beginCicle(g:grafo,nodesInPath:List[bool])->List[int]:
     path = []
     v1=random.randint(0, len(g.vertices)-1)
     path.append(v1)
@@ -148,7 +147,50 @@ def opt_2(g:grafo, path:List[int], weight):
         bestWeight,bestPath = opt_2(g, bestPath, bestWeight)
     return bestWeight,bestPath
 
+def opt_3(g:grafo,path:List[int]):
+    while True:
+        delta = 0
+        for (a, b, c) in all_segments(len(path)):
+            delta += reverse_segment_if_better(path, a, b, c,g)
+        if delta >= 0:
+            break
+    return path
 
+
+def reverse_segment_if_better(path, i, j, k,g):
+    if i ==0:
+        anti=len(path)-1
+    else:
+        anti=i-1
+    A, B, C, D, E, F = path[anti], path[i], path[j-1], path[j], path[k-1], path[k % len(path)]
+    case0 = distanciaEuclidiana(g.vertices[A], g.vertices[B]) + distanciaEuclidiana(g.vertices[C], g.vertices[D]) + distanciaEuclidiana(g.vertices[E], g.vertices[F])
+    case1 = distanciaEuclidiana(g.vertices[A], g.vertices[C]) + distanciaEuclidiana(g.vertices[B], g.vertices[D]) + distanciaEuclidiana(g.vertices[E], g.vertices[F])
+    case2 = distanciaEuclidiana(g.vertices[A], g.vertices[B]) + distanciaEuclidiana(g.vertices[C], g.vertices[E]) + distanciaEuclidiana(g.vertices[D], g.vertices[F])
+    case3 = distanciaEuclidiana(g.vertices[A], g.vertices[D]) + distanciaEuclidiana(g.vertices[E], g.vertices[B]) + distanciaEuclidiana(g.vertices[C], g.vertices[F])
+    case4 = distanciaEuclidiana(g.vertices[F], g.vertices[B]) + distanciaEuclidiana(g.vertices[C], g.vertices[D]) + distanciaEuclidiana(g.vertices[E], g.vertices[A])
+
+    if case0 > case1:
+        path[i:j] = reversed(path[i:j])
+        return -case0 + case1
+    elif case0 > case2:
+        path[j:k] = reversed(path[j:k])
+        return -case0 + case2
+    elif case0 > case4:
+        path[i:k] = reversed(path[i:k])
+        return -case0 + case4
+    elif case0 > case3:
+        tmp = path[j:k] + path[i:j]
+        path[i:k] = tmp
+        return -case0 + case3
+    return 0
+
+def all_segments(n: int):
+    return ((i, j, k)
+        for i in range(n)
+        for j in range(i + 2, n)
+        for k in range(j + 2, n + (i > 0)))
+    
+    
 def main():
     #x = 33522
     construtor = getVertices()
@@ -162,6 +204,7 @@ def main():
     g = constroiGrafo(construtor)
     for _  in range(100):
         vertices =  nearestNeighbor(g)
+        vertices1=deepcopy(vertices)
         caminho = getDistancia(g, vertices)
         if caminho>max:
             max=caminho
@@ -169,6 +212,8 @@ def main():
             min=caminho
         mediaBuild=mediaBuild+caminho
         best,bestPath = opt_2(g, vertices, caminho)
+        bestpath=opt_3(g,vertices1)
+        bestopt=getDistancia(g,bestpath)
         if best>maxM:
             maxM=best
         if best<minM:
