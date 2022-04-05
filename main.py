@@ -2,12 +2,13 @@
 from copy import deepcopy
 from tokenize import Double
 from typing import List
+from xmlrpc.client import boolean
 from estrutura import *
 import sys
 import random
 
 
-def getNearest(g:grafo, node:int, nodesInPath:List[bool])->int:
+def getNearest(g:grafo, node:int, nodesInPath:List[boolean])->int:
     best = math.inf
     nearest = math.inf
     for i in range(len(g.vertices)):
@@ -18,7 +19,7 @@ def getNearest(g:grafo, node:int, nodesInPath:List[bool])->int:
                 nearest = i
     return nearest
 
-def insereNoCiclo(g:grafo, path:List[int], nodesInPath:List[bool],vertice:int)->None:
+def insereNoCiclo(g:grafo, path:List[int], nodesInPath:List[boolean],vertice:int)->None:
     entryCost=0
     exitCost=0
     bestCost=math.inf
@@ -91,7 +92,7 @@ def getVertices():
     return vertices
 
 
-def isAllInPath(nodesInPath)->bool:
+def isAllInPath(nodesInPath)->boolean:
     for i in nodesInPath:
         if not i:
             return False
@@ -107,13 +108,13 @@ def nearestNeighbor(g: grafo)->List[int]:
     return path
 
 
-def putNearestAtPath(path:List[int], g:grafo, nodesInPath:List[bool]):
+def putNearestAtPath(path:List[int], g:grafo, nodesInPath:List[boolean]):
     ultimoInserido = path[len(path)-1]
     maisProximo = getNearest(g, ultimoInserido, nodesInPath)
     path.append(maisProximo)
     nodesInPath[maisProximo] = True
 
-def beginCicle(g:grafo,nodesInPath:List[bool])->List[int]:
+def beginCicle(g:grafo,nodesInPath:List[boolean])->List[int]:
     path = []
     v1=random.randint(0, len(g.vertices)-1)
     path.append(v1)
@@ -202,7 +203,7 @@ def main():
     maxM=0
     mediaM=0
     g = constroiGrafo(construtor)
-    for _  in range(100):
+    for _  in range(10):
         vertices =  nearestNeighbor(g)
         vertices1=deepcopy(vertices)
         caminho = getDistancia(g, vertices)
@@ -212,13 +213,13 @@ def main():
             min=caminho
         mediaBuild=mediaBuild+caminho
         best,bestPath = opt_2(g, vertices, caminho)
-        bestpath=opt_3(g,vertices1)
-        bestopt=getDistancia(g,bestpath)
         if best>maxM:
             maxM=best
         if best<minM:
             minM=best
         mediaM=mediaM+best
+        bestpath=opt_3(g,vertices1)
+        opt3=getDistancia(g,bestpath)
     print("Media do Contrutivo: "+str(mediaBuild/100))
     print("Pior do Contrutivo: "+str(max))
     print("Melhor do Construtivo: "+str(min))
