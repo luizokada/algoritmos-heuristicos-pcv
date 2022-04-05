@@ -1,9 +1,6 @@
 
 from copy import deepcopy
-from tokenize import Double
 from typing import List
-
-from cv2 import DescriptorMatcher
 from estrutura import *
 import sys
 import random
@@ -26,8 +23,9 @@ def insereNoCiclo(g: grafo, path: List[int], nodesInPath: List[bool], vertice: i
     exitCost = 0
     bestCost = math.inf
     entryIndex = math.inf
-    for i in range(len(path)):
-        if i != 0 and i != len(path)-1:
+    n = len(path)
+    for i in range(n):
+        if i != 0 and i != n-1:
             exitCost = distanciaEuclidiana(
                 g.vertices[path[i]], g.vertices[path[i-1]])
             entryCost = distanciaEuclidiana(g.vertices[path[i]], g.vertices[vertice]) +\
@@ -35,8 +33,8 @@ def insereNoCiclo(g: grafo, path: List[int], nodesInPath: List[bool], vertice: i
 
         elif i == 0:
             exitCost = distanciaEuclidiana(
-                g.vertices[path[len(path)-1]], g.vertices[path[i]])
-            entryCost = distanciaEuclidiana(g.vertices[path[len(path)-1]], g.vertices[vertice]) +\
+                g.vertices[path[n-1]], g.vertices[path[i]])
+            entryCost = distanciaEuclidiana(g.vertices[path[n-1]], g.vertices[vertice]) +\
                 distanciaEuclidiana(g.vertices[path[i]], g.vertices[vertice])
 
         else:
@@ -51,7 +49,7 @@ def insereNoCiclo(g: grafo, path: List[int], nodesInPath: List[bool], vertice: i
             bestCost = custoTotal
             entryIndex = i
 
-    if entryIndex < len(path)-1:
+    if entryIndex < n-1:
         path.insert(entryIndex, vertice)
     else:
         path.append(vertice)
@@ -145,8 +143,9 @@ def nearestInsertion(g: grafo) -> List[int]:
 def opt_2(g: grafo, path: List[int], weight):
     bestPath = path
     bestWeight = weight
-    for i in range(len(path)-1):
-        for j in range(i+1, len(path)):
+    n = len(path)
+    for i in range(n-1):
+        for j in range(i+1, n):
             newPath = buildNewPath(path, i, j)
             newWeight = getDistancia(g, newPath)
             if newWeight < bestWeight:
@@ -165,7 +164,7 @@ def opt_3(g: grafo, path: List[int]):
         for i in range(n-4):
             for j in range(i + 2, n-2):
                 for k in range(j + 2, n):
-                    descount = DescriptorMatcher + \
+                    descount = descount + \
                         getBestCase(path, g, i, j, k)
         if descount >= 0:
             better = False
@@ -217,7 +216,7 @@ def main():
     maxM = 0
     mediaM = 0
     g = constroiGrafo(construtor)
-    for _ in range(100):
+    for _ in range(2):
         vertices = nearestNeighbor(g)
         vertices1 = deepcopy(vertices)
         caminho = getDistancia(g, vertices)
