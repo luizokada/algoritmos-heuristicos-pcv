@@ -18,11 +18,7 @@ TEST_CASES = ['./tests/brd14051.tsp',
 NUM_RUNS = 10
 
 
-<<<<<<< HEAD
-def getNearest(g:grafo, node:int, nodesInPath:List[boolean])->int:
-=======
 def getNearest(g: grafo, node: int, nodesInPath: List[bool]) -> int:
->>>>>>> 1ffc3f9e92a1ef3b30798de4568e2ae17b9a1dc6
     best = math.inf
     nearest = math.inf
     for i in range(len(g.vertices)):
@@ -33,24 +29,6 @@ def getNearest(g: grafo, node: int, nodesInPath: List[bool]) -> int:
                 nearest = i
     return nearest
 
-<<<<<<< HEAD
-def insereNoCiclo(g:grafo, path:List[int], nodesInPath:List[boolean],vertice:int)->None:
-    entryCost=0
-    exitCost=0
-    bestCost=math.inf
-    entryIndex=math.inf
-    for i in range(len(path)):
-        if i !=0 and i!=len(path)-1:
-            exitCost=distanciaEuclidiana(g.vertices[path[i]],g.vertices[path[i-1]])
-            entryCost=distanciaEuclidiana(g.vertices[path[i]],g.vertices[vertice])+\
-                            distanciaEuclidiana(g.vertices[path[i-1]],g.vertices[vertice])
-                            
-        elif i==0:
-            exitCost=distanciaEuclidiana(g.vertices[path[len(path)-1]],g.vertices[path[i]])
-            entryCost=distanciaEuclidiana(g.vertices[path[len(path)-1]],g.vertices[vertice])+\
-                            distanciaEuclidiana(g.vertices[path[i]],g.vertices[vertice])
-                            
-=======
 
 def insereNoCiclo(g: grafo, path: List[int], nodesInPath: List[bool], vertice: int) -> None:
     entryCost = 0
@@ -71,7 +49,6 @@ def insereNoCiclo(g: grafo, path: List[int], nodesInPath: List[bool], vertice: i
             entryCost = distanciaEuclidiana(g.vertices[path[n-1]], g.vertices[vertice]) +\
                 distanciaEuclidiana(g.vertices[path[i]], g.vertices[vertice])
 
->>>>>>> 1ffc3f9e92a1ef3b30798de4568e2ae17b9a1dc6
         else:
             exitCost = distanciaEuclidiana(
                 g.vertices[path[i]], g.vertices[path[i-1]])
@@ -131,11 +108,7 @@ def getVertices():
     return vertices
 
 
-<<<<<<< HEAD
-def isAllInPath(nodesInPath)->boolean:
-=======
 def isAllInPath(nodesInPath) -> bool:
->>>>>>> 1ffc3f9e92a1ef3b30798de4568e2ae17b9a1dc6
     for i in nodesInPath:
         if not i:
             return False
@@ -151,22 +124,14 @@ def nearestNeighbor(g: grafo) -> List[int]:
     return path
 
 
-<<<<<<< HEAD
-def putNearestAtPath(path:List[int], g:grafo, nodesInPath:List[boolean]):
-=======
 def putNearestAtPath(path: List[int], g: grafo, nodesInPath: List[bool]):
->>>>>>> 1ffc3f9e92a1ef3b30798de4568e2ae17b9a1dc6
     ultimoInserido = path[len(path)-1]
     maisProximo = getNearest(g, ultimoInserido, nodesInPath)
     path.append(maisProximo)
     nodesInPath[maisProximo] = True
 
-<<<<<<< HEAD
-def beginCicle(g:grafo,nodesInPath:List[boolean])->List[int]:
-=======
 
 def beginCicle(g: grafo, nodesInPath: List[bool]) -> List[int]:
->>>>>>> 1ffc3f9e92a1ef3b30798de4568e2ae17b9a1dc6
     path = []
     v1 = random.randint(0, len(g.vertices)-1)
     path.append(v1)
@@ -254,7 +219,6 @@ def getBestCase(path, g, i, j, k):
 
 def main():
     # x = 33522
-<<<<<<< HEAD
     construtor = getVertices()
     mediaBuild = 0
     max = 0
@@ -264,25 +228,6 @@ def main():
     maxM = 0
     mediaM = 0
     g = constroiGrafo(construtor)
-<<<<<<< HEAD
-    for _  in range(10):
-        vertices =  nearestNeighbor(g)
-        vertices1=deepcopy(vertices)
-        caminho = getDistancia(g, vertices)
-        if caminho>max:
-            max=caminho
-        if caminho<min:
-            min=caminho
-        mediaBuild=mediaBuild+caminho
-        best,bestPath = opt_2(g, vertices, caminho)
-        if best>maxM:
-            maxM=best
-        if best<minM:
-            minM=best
-        mediaM=mediaM+best
-        bestpath=opt_3(g,vertices1)
-        opt3=getDistancia(g,bestpath)
-=======
     for _ in range(2):
         vertices = nearestNeighbor(g)
         vertices1 = deepcopy(vertices)
@@ -300,7 +245,6 @@ def main():
         if best < minM:
             minM = best
         mediaM = mediaM+best
->>>>>>> 1ffc3f9e92a1ef3b30798de4568e2ae17b9a1dc6
     print("Media do Contrutivo: "+str(mediaBuild/100))
     print("Pior do Contrutivo: "+str(max))
     print("Melhor do Construtivo: "+str(min))
@@ -312,41 +256,6 @@ def main():
     caminho = getDistancia(g, distante)
     bestd, bestPath1 = opt_2(g, distante, caminho)
     print(distante)
-=======
-
-    if sys.argv[1] == "-1":
-        print("ola")
-    else:
-        construtor = getVertices()
-        g = constroiGrafo(construtor)
-        better = math.inf
-        for _ in range(NUM_RUNS):
-            vertices = nearestNeighbor(g)
-            caminho = getDistancia(g, vertices)
-            if caminho > max:
-                max = caminho
-            if caminho < min:
-                min = caminho
-            mediaBuild = mediaBuild+caminho
-            best, bestPath = opt_2(g, vertices, caminho)
-
-            bestopt = getDistancia(g, bestpath)
-            if best > maxM:
-                maxM = best
-            if best < minM:
-                minM = best
-            mediaM = mediaM+best
-        print("Media do Contrutivo: "+str(mediaBuild/100))
-        print("Pior do Contrutivo: "+str(max))
-        print("Melhor do Construtivo: "+str(min))
-        print("Media do Melhorativo: "+str(mediaM/100))
-        print("Pior do Melhorativo: "+str(maxM))
-        print("Melhor do Melhorativo: "+str(minM))
-        distante = nearestInsertion(g)
-        caminho = getDistancia(g, distante)
-        bestd, bestPath1 = opt_2(g, distante, caminho)
-        print(distante)
->>>>>>> 6236dcd7f973db09613f986f72be4e8a0b907c13
 
 
 main()
