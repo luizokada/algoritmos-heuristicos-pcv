@@ -6,14 +6,17 @@ from estrutura import *
 import sys
 import random
 
-TEST_CASES = ['./tests/brd14051.tsp',
-              './tests/d15112.tsp',
-              './tests/d18512.tsp',
-              './tests/fnl4461.tsp',
-              './tests/pla79397.tsp',
-              './tests/pla33810.tsp',
-              './tests/pla85900.tsp',
-              './tests/pr1002.tsp']
+TEST_CASES = [
+    './tests/pla48.tsp',
+    './tests/pr1002.tsp',
+    './tests/fnl4461.tsp',
+    './tests/brd14051.tsp',
+    './tests/d15112.tsp',
+    './tests/d18512.tsp',
+    './tests/pla33810.tsp',
+    './tests/pla79397.tsp',
+    './tests/pla85900.tsp'
+              ]
 
 NUM_RUNS = 10
 
@@ -107,7 +110,37 @@ def getVertices():
         vertices.append(construtor[i].split(' '))
     return vertices
 
-
+def getConstructiorByArq(path):
+    arq=open(path)
+    vertices=[]
+    description=[]
+    lines=arq.readlines()
+    for line in lines:
+        description.append(line.strip('\n'))
+    if description[len(description)-1].find('EOF') ==-1:
+        n=len(description)
+    else:
+        n=len(description)-1
+    construtor = description[6: n]
+    for i in range(len(construtor)):
+        vertices.append(construtor[i].split(' '))
+    arq.close()
+    return vertices
+    
+def writeResults(nearestNeihgborWeihgt,nearestInsertionWeight,opt2,opt3,path):
+    response="./results/"+path
+    arq=open(response,'w')
+    arq.write("Teste: " + path+"\n")
+    arq.write("Nearest Neihgbor: " + str(nearestNeihgborWeihgt)+"\n")
+    arq.write("Opt 2 para Nearest Neihgbor: " + str(opt2[0])+"\n")
+    arq.write("Opt 3 para Nearest Neihgbor: " + str(opt3[0])+"\n")
+    arq.write("Nearest insertion: " + str(nearestInsertionWeight)+"\n")
+    arq.write("Opt 2 para Nearest insertion: " + str(opt2[1])+"\n")
+    arq.write("Opt 3 para Nearest insertion: " + str(opt3[1])+"\n")
+    
+    arq.close()
+    return
+    
 def isAllInPath(nodesInPath) -> bool:
     for i in nodesInPath:
         if not i:
@@ -218,44 +251,64 @@ def getBestCase(path, g, i, j, k):
 
 
 def main():
-    # x = 33522
-    construtor = getVertices()
-    mediaBuild = 0
-    max = 0
-    min = math.inf
-
-    minM = math.inf
-    maxM = 0
-    mediaM = 0
-    g = constroiGrafo(construtor)
-    for _ in range(2):
+    if sys.argv[1] == "test":
+        for test in TEST_CASES:
+            opt2Cases=[]
+            opt3Cases=[]
+            constructor=getConstructiorByArq(test)
+            g = constroiGrafo(constructor)
+            newpath=test.split("/")
+            
+            nearestNeighborPath = nearestNeighbor(g)
+            nearestNeighborPath2 = deepcopy( nearestNeighborPath )
+            nearestNeighborWeight = getDistancia(g, nearestNeighborPath)
+            
+            
+            opt2Weight, opt2Path = opt_2(g, nearestNeighborPath, nearestNeighborWeight)
+            opt2Cases.append(opt2Weight)
+            
+            
+            opt3Path = opt_3(g, nearestNeighborPath2)
+            opt3Weight = getDistancia(g, opt3Path)
+            opt3Cases.append(opt3Weight)
+            
+            
+            nearestInsertionPath = nearestInsertion(g)
+            nearestInsertionPath2=deepcopy(nearestInsertionPath)
+            nearestInsertionWeight=getDistancia(g, nearestInsertionPath)
+            
+            
+            opt2Weight, opt2Path = opt_2(g, nearestInsertionPath, nearestInsertionWeight)
+            opt2Cases.append(opt2Weight)
+            
+            opt3Path = opt_3(g, nearestInsertionPath2)
+            opt3Weight = getDistancia(g, opt3Path)
+            opt3Cases.append(opt3Weight)
+            
+            
+            writeResults(nearestNeighborWeight,nearestInsertionWeight,opt2Cases,opt3Cases,newpath[2])
+    elif sys.argv[1]=="run":   
+        construtor = getVertices()
+        
+        g = constroiGrafo(construtor)
+       
+      
+      
         vertices = nearestNeighbor(g)
         vertices1 = deepcopy(vertices)
         caminho = getDistancia(g, vertices)
-        if caminho > max:
-            max = caminho
-        if caminho < min:
-            min = caminho
-        mediaBuild = mediaBuild+caminho
-        best, bestPath = opt_2(g, vertices, caminho)
+        
+        bestopt2, bestPath = opt_2(g, vertices, caminho)
         bestpath = opt_3(g, vertices1)
-        bestopt = getDistancia(g, bestpath)
-        if best > maxM:
-            maxM = best
-        if best < minM:
-            minM = best
-        mediaM = mediaM+best
-    print("Media do Contrutivo: "+str(mediaBuild/100))
-    print("Pior do Contrutivo: "+str(max))
-    print("Melhor do Construtivo: "+str(min))
-
-    print("Media do Melhorativo: "+str(mediaM/100))
-    print("Pior do Melhorativo: "+str(maxM))
-    print("Melhor do Melhorativo: "+str(minM))
-    distante = nearestInsertion(g)
-    caminho = getDistancia(g, distante)
-    bestd, bestPath1 = opt_2(g, distante, caminho)
-    print(distante)
+        bestopt3 = getDistancia(g, bestpath)
+       
+       
+        distante = nearestInsertion(g)
+        caminho = getDistancia(g, distante)
+        bestd, bestPath1 = opt_2(g, distante, caminho)
+        
+        
+        print(distante)
 
 
 main()
