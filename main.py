@@ -5,6 +5,17 @@ from estrutura import *
 import sys
 import random
 
+TEST_CASES = ['./tests/brd14051.tsp',
+              './tests/d15112.tsp',
+              './tests/d18512.tsp',
+              './tests/fnl4461.tsp',
+              './tests/pla79397.tsp',
+              './tests/pla33810.tsp',
+              './tests/pla85900.tsp',
+              './tests/pr1002.tsp']
+
+NUM_RUNS = 10
+
 
 def getNearest(g: grafo, node: int, nodesInPath: List[bool]) -> int:
     best = math.inf
@@ -207,43 +218,39 @@ def getBestCase(path, g, i, j, k):
 
 def main():
     # x = 33522
-    construtor = getVertices()
-    mediaBuild = 0
-    max = 0
-    min = math.inf
 
-    minM = math.inf
-    maxM = 0
-    mediaM = 0
-    g = constroiGrafo(construtor)
-    for _ in range(2):
-        vertices = nearestNeighbor(g)
-        vertices1 = deepcopy(vertices)
-        caminho = getDistancia(g, vertices)
-        if caminho > max:
-            max = caminho
-        if caminho < min:
-            min = caminho
-        mediaBuild = mediaBuild+caminho
-        best, bestPath = opt_2(g, vertices, caminho)
-        bestpath = opt_3(g, vertices1)
-        bestopt = getDistancia(g, bestpath)
-        if best > maxM:
-            maxM = best
-        if best < minM:
-            minM = best
-        mediaM = mediaM+best
-    print("Media do Contrutivo: "+str(mediaBuild/100))
-    print("Pior do Contrutivo: "+str(max))
-    print("Melhor do Construtivo: "+str(min))
+    if sys.argv[1] == "-1":
+        print("ola")
+    else:
+        construtor = getVertices()
+        g = constroiGrafo(construtor)
+        better = math.inf
+        for _ in range(NUM_RUNS):
+            vertices = nearestNeighbor(g)
+            caminho = getDistancia(g, vertices)
+            if caminho > max:
+                max = caminho
+            if caminho < min:
+                min = caminho
+            mediaBuild = mediaBuild+caminho
+            best, bestPath = opt_2(g, vertices, caminho)
 
-    print("Media do Melhorativo: "+str(mediaM/100))
-    print("Pior do Melhorativo: "+str(maxM))
-    print("Melhor do Melhorativo: "+str(minM))
-    distante = nearestInsertion(g)
-    caminho = getDistancia(g, distante)
-    bestd, bestPath1 = opt_2(g, distante, caminho)
-    print(distante)
+            bestopt = getDistancia(g, bestpath)
+            if best > maxM:
+                maxM = best
+            if best < minM:
+                minM = best
+            mediaM = mediaM+best
+        print("Media do Contrutivo: "+str(mediaBuild/100))
+        print("Pior do Contrutivo: "+str(max))
+        print("Melhor do Construtivo: "+str(min))
+        print("Media do Melhorativo: "+str(mediaM/100))
+        print("Pior do Melhorativo: "+str(maxM))
+        print("Melhor do Melhorativo: "+str(minM))
+        distante = nearestInsertion(g)
+        caminho = getDistancia(g, distante)
+        bestd, bestPath1 = opt_2(g, distante, caminho)
+        print(distante)
 
 
 main()
