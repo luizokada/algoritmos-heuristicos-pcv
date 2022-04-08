@@ -1,7 +1,7 @@
 Teste: pla48.tsp
-Nearest Neihgbor: 44144.3160510732
-Opt 2 para Nearest Neihgbor: 35235.09746892978
-Opt 3 para Nearest Neihgbor: 34736.43749647383
-Nearest insertion: 38387.06577525294
-Opt 2 para Nearest insertion: 34260.174997037786
-Opt 3 para Nearest insertion: 34718.41595448699
+Nearest Neihgbor: 40505.19554670827
+Opt 2 para Nearest Neihgbor: 34598.14850269948
+Opt 3 para Nearest Neihgbor: 34752.48033599678
+Nearest insertion: 38770.300538430005
+Opt 2 para Nearest insertion: 34151.25519963495
+Opt 3 para Nearest insertion: 34637.92396836608

@@ -16,7 +16,7 @@ TEST_CASES = [
     './tests/pla33810.tsp',
     './tests/pla79397.tsp',
     './tests/pla85900.tsp'
-              ]
+]
 
 NUM_RUNS = 10
 
@@ -110,26 +110,28 @@ def getVertices():
         vertices.append(construtor[i].split(' '))
     return vertices
 
+
 def getConstructiorByArq(path):
-    arq=open(path)
-    vertices=[]
-    description=[]
-    lines=arq.readlines()
+    arq = open(path)
+    vertices = []
+    description = []
+    lines = arq.readlines()
     for line in lines:
         description.append(line.strip('\n'))
-    if description[len(description)-1].find('EOF') ==-1:
-        n=len(description)
+    if description[len(description)-1].find('EOF') == -1:
+        n = len(description)
     else:
-        n=len(description)-1
+        n = len(description)-1
     construtor = description[6: n]
     for i in range(len(construtor)):
         vertices.append(construtor[i].split(' '))
     arq.close()
     return vertices
-    
-def writeResults(nearestNeihgborWeihgt,nearestInsertionWeight,opt2,opt3,path):
-    response="./results/"+path
-    arq=open(response,'w')
+
+
+def writeResults(nearestNeihgborWeihgt, nearestInsertionWeight, opt2, opt3, path):
+    response = "./results/"+path
+    arq = open(response, 'w')
     arq.write("Teste: " + path+"\n")
     arq.write("Nearest Neihgbor: " + str(nearestNeihgborWeihgt)+"\n")
     arq.write("Opt 2 para Nearest Neihgbor: " + str(opt2[0])+"\n")
@@ -137,10 +139,11 @@ def writeResults(nearestNeihgborWeihgt,nearestInsertionWeight,opt2,opt3,path):
     arq.write("Nearest insertion: " + str(nearestInsertionWeight)+"\n")
     arq.write("Opt 2 para Nearest insertion: " + str(opt2[1])+"\n")
     arq.write("Opt 3 para Nearest insertion: " + str(opt3[1])+"\n")
-    
+
     arq.close()
     return
-    
+
+
 def isAllInPath(nodesInPath) -> bool:
     for i in nodesInPath:
         if not i:
@@ -253,61 +256,62 @@ def getBestCase(path, g, i, j, k):
 def main():
     if sys.argv[1] == "test":
         for test in TEST_CASES:
-            opt2Cases=[]
-            opt3Cases=[]
-            constructor=getConstructiorByArq(test)
+            opt2Cases = []
+            opt3Cases = []
+            constructor = getConstructiorByArq(test)
             g = constroiGrafo(constructor)
-            newpath=test.split("/")
-            
+            newpath = test.split("/")
+
             nearestNeighborPath = nearestNeighbor(g)
-            nearestNeighborPath2 = deepcopy( nearestNeighborPath )
+            nearestNeighborPath2 = deepcopy(nearestNeighborPath)
             nearestNeighborWeight = getDistancia(g, nearestNeighborPath)
-            
-            
-            opt2Weight, opt2Path = opt_2(g, nearestNeighborPath, nearestNeighborWeight)
+
+            print("Nearest Neihgbor pronto para: "+newpath[2])
+
+            opt2Weight, opt2Path = opt_2(
+                g, nearestNeighborPath, nearestNeighborWeight)
             opt2Cases.append(opt2Weight)
-            
-            
+            print("opt2 Nearest Neihgbor pronto para: "+newpath[2])
+
             opt3Path = opt_3(g, nearestNeighborPath2)
             opt3Weight = getDistancia(g, opt3Path)
             opt3Cases.append(opt3Weight)
-            
-            
+            print("Opt3 Nearest Neihgbor pronto para: "+newpath[2])
+
             nearestInsertionPath = nearestInsertion(g)
-            nearestInsertionPath2=deepcopy(nearestInsertionPath)
-            nearestInsertionWeight=getDistancia(g, nearestInsertionPath)
-            
-            
-            opt2Weight, opt2Path = opt_2(g, nearestInsertionPath, nearestInsertionWeight)
+            nearestInsertionPath2 = deepcopy(nearestInsertionPath)
+            nearestInsertionWeight = getDistancia(g, nearestInsertionPath)
+            print("Nearest insertion pronto para: "+newpath[2])
+
+            opt2Weight, opt2Path = opt_2(
+                g, nearestInsertionPath, nearestInsertionWeight)
             opt2Cases.append(opt2Weight)
-            
+            print("Opt2 Nearest insertion pronto para: "+newpath[2])
+
             opt3Path = opt_3(g, nearestInsertionPath2)
             opt3Weight = getDistancia(g, opt3Path)
             opt3Cases.append(opt3Weight)
-            
-            
-            writeResults(nearestNeighborWeight,nearestInsertionWeight,opt2Cases,opt3Cases,newpath[2])
-    elif sys.argv[1]=="run":   
+            print("Opt 3 Nearest insertion pronto para: "+newpath[2])
+
+            writeResults(nearestNeighborWeight, nearestInsertionWeight,
+                         opt2Cases, opt3Cases, newpath[2])
+    elif sys.argv[1] == "run":
         construtor = getVertices()
-        
+
         g = constroiGrafo(construtor)
-       
-      
-      
+
         vertices = nearestNeighbor(g)
         vertices1 = deepcopy(vertices)
         caminho = getDistancia(g, vertices)
-        
+
         bestopt2, bestPath = opt_2(g, vertices, caminho)
         bestpath = opt_3(g, vertices1)
         bestopt3 = getDistancia(g, bestpath)
-       
-       
+
         distante = nearestInsertion(g)
         caminho = getDistancia(g, distante)
         bestd, bestPath1 = opt_2(g, distante, caminho)
-        
-        
+
         print(distante)
 
 
