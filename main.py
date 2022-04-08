@@ -193,13 +193,24 @@ def opt_2(g: grafo, path: List[int], weight):
     bestWeight = weight
     n = len(path)
     for i in range(n-1):
-        for j in range(i+1, n):
-            newPath = buildNewPath(path, i, j)
-            newWeight = getDistancia(g, newPath)
+        for j in range(i+1, n-1):
+            if i==0:
+                anti=n-1
+            else:
+                anti=i-1
+            if j==n-1:
+                afterj=0
+            else:
+                afterj=j+1
+            exitCost=distanciaEuclidiana(g.vertices[path[i]],g.vertices[path[anti]])+distanciaEuclidiana(g.vertices[path[j]],g.vertices[path[afterj]])
+            entryCost=distanciaEuclidiana(g.vertices[path[j]],g.vertices[path[anti]])+distanciaEuclidiana(g.vertices[path[i]],g.vertices[path[afterj]])
+            newWeight = weight-exitCost+entryCost
             if newWeight < bestWeight:
                 bestWeight = newWeight
-                bestPath = deepcopy(newPath)
+                changVerteexi=i
+                changVerteexj=j
     if bestWeight < weight:
+        bestPath = buildNewPath(path,changVerteexi,changVerteexj)
         bestWeight, bestPath = opt_2(g, bestPath, bestWeight)
     return bestWeight, bestPath
 
