@@ -8,13 +8,15 @@ import random
 
 TEST_CASES = [
     './tests/pla48.tsp',
-    './tests/pr1002.tsp',
+    './tests/a280.tsp',
+    './tests/att532.tsp',
+    './tests/bier127.tsp',
     './tests/fnl4461.tsp',
+    './tests/pla7397.tsp',
     './tests/brd14051.tsp',
     './tests/d15112.tsp',
     './tests/d18512.tsp',
     './tests/pla33810.tsp',
-    './tests/pla79397.tsp',
     './tests/pla85900.tsp'
 ]
 
@@ -33,7 +35,7 @@ def getNearest(g: grafo, node: int, nodesInPath: List[bool]) -> int:
     return nearest
 
 
-def insereNoCiclo(g: grafo, path: List[int], nodesInPath: List[bool], vertice: int) -> None:
+def putInPath(g: grafo, path: List[int], nodesInPath: List[bool], vertice: int) -> None:
     entryCost = 0
     exitCost = 0
     bestCost = math.inf
@@ -184,7 +186,7 @@ def nearestInsertion(g: grafo) -> List[int]:
     while not isAllInPath(nodesInPath):
         vertice = path[random.randint(0, len(path)-1)]
         maisProximo = getNearest(g, vertice, nodesInPath)
-        insereNoCiclo(g, path, nodesInPath, maisProximo)
+        putInPath(g, path, nodesInPath, maisProximo)
     return path
 
 
@@ -194,23 +196,25 @@ def opt_2(g: grafo, path: List[int], weight):
     n = len(path)
     for i in range(n-1):
         for j in range(i+1, n-1):
-            if i==0:
-                anti=n-1
+            if i == 0:
+                anti = n-1
             else:
-                anti=i-1
-            if j==n-1:
-                afterj=0
+                anti = i-1
+            if j == n-1:
+                afterj = 0
             else:
-                afterj=j+1
-            exitCost=distanciaEuclidiana(g.vertices[path[i]],g.vertices[path[anti]])+distanciaEuclidiana(g.vertices[path[j]],g.vertices[path[afterj]])
-            entryCost=distanciaEuclidiana(g.vertices[path[j]],g.vertices[path[anti]])+distanciaEuclidiana(g.vertices[path[i]],g.vertices[path[afterj]])
+                afterj = j+1
+            exitCost = distanciaEuclidiana(
+                g.vertices[path[i]], g.vertices[path[anti]])+distanciaEuclidiana(g.vertices[path[j]], g.vertices[path[afterj]])
+            entryCost = distanciaEuclidiana(
+                g.vertices[path[j]], g.vertices[path[anti]])+distanciaEuclidiana(g.vertices[path[i]], g.vertices[path[afterj]])
             newWeight = weight-exitCost+entryCost
             if newWeight < bestWeight:
                 bestWeight = newWeight
-                changVerteexi=i
-                changVerteexj=j
+                changVerteexi = i
+                changVerteexj = j
     if bestWeight < weight:
-        bestPath = buildNewPath(path,changVerteexi,changVerteexj)
+        bestPath = buildNewPath(path, changVerteexi, changVerteexj)
         bestWeight, bestPath = opt_2(g, bestPath, bestWeight)
     return bestWeight, bestPath
 
@@ -286,6 +290,7 @@ def main():
 
             opt3Path = opt_3(g, nearestNeighborPath2)
             opt3Weight = getDistancia(g, opt3Path)
+
             opt3Cases.append(opt3Weight)
             print("Opt3 Nearest Neihgbor pronto para: "+newpath[2])
 
@@ -301,29 +306,45 @@ def main():
 
             opt3Path = opt_3(g, nearestInsertionPath2)
             opt3Weight = getDistancia(g, opt3Path)
+
             opt3Cases.append(opt3Weight)
             print("Opt 3 Nearest insertion pronto para: "+newpath[2])
 
-            writeResults(nearestNeighborWeight, nearestInsertionWeight,
+            writeResults(nearestNeighborWeight, 0,
                          opt2Cases, opt3Cases, newpath[2])
     elif sys.argv[1] == "run":
         construtor = getVertices()
-
+        opt2Cases = []
+        opt3Cases = []
         g = constroiGrafo(construtor)
 
-        vertices = nearestNeighbor(g)
-        vertices1 = deepcopy(vertices)
-        caminho = getDistancia(g, vertices)
+        nearestNeighborPath = nearestNeighbor(g)
+        nearestNeighborPath2 = deepcopy(nearestNeighborPath)
+        nearestNeighborWeight = getDistancia(g, nearestNeighborPath)
 
-        bestopt2, bestPath = opt_2(g, vertices, caminho)
-        bestpath = opt_3(g, vertices1)
-        bestopt3 = getDistancia(g, bestpath)
+        opt2Weight, opt2Path = opt_2(
+            g, nearestNeighborPath, nearestNeighborWeight)
+        opt2Cases.append(opt2Weight)
 
-        distante = nearestInsertion(g)
-        caminho = getDistancia(g, distante)
-        bestd, bestPath1 = opt_2(g, distante, caminho)
+        opt3Path = opt_3(g, nearestNeighborPath2)
+        opt3Weight = getDistancia(g, opt3Path)
+        opt3Cases.append(opt3Weight)
 
-        print(distante)
+        nearestInsertionPath = nearestInsertion(g)
+        nearestInsertionPath2 = deepcopy(nearestInsertionPath)
+        nearestInsertionWeight = getDistancia(g, nearestInsertionPath)
+
+        opt2Weight, opt2Path = opt_2(
+            g, nearestInsertionPath, nearestInsertionWeight)
+        opt2Cases.append(opt2Weight)
+
+        opt3Path = opt_3(g, nearestInsertionPath2)
+        opt3Weight = getDistancia(g, opt3Path)
+        opt3Cases.append(opt3Weight)
+        best = []
+        best.append(min(opt2Cases))
+        best.append(min(opt3Cases))
+        print(min(best))
 
 
 main()
