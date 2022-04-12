@@ -310,7 +310,7 @@ def main():
             opt3Cases.append(opt3Weight)
             print("Opt 3 Nearest insertion pronto para: "+newpath[2])
 
-            writeResults(nearestNeighborWeight, 0,
+            writeResults(nearestNeighborWeight, nearestInsertionWeight,
                          opt2Cases, opt3Cases, newpath[2])
     elif sys.argv[1] == "run":
         construtor = getVertices()
